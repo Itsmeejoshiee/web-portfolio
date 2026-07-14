@@ -1,12 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 
+// Every nav item points at its home-page section anchor, same as Studio —
+// visiting the dedicated /work, /templates, /blog pages only happens via
+// each section's "see more" link. `matchPath` still lets the nav highlight
+// itself when the user does end up on one of those pages.
 const NAV_LINKS = [
-  { key: 'work', label: 'work', to: '/work' },
-  // Studio only ever exists as a same-page anchor on the home route, so it
-  // never represents "the current page" the way work/templates/blog do.
-  { key: 'studio', label: 'studio', to: { pathname: '/', hash: '#studio' }, hashOnly: true },
-  { key: 'templates', label: 'templates', to: '/templates' },
-  { key: 'blog', label: 'blog', to: '/blog' },
+  { key: 'work', label: 'work', to: { pathname: '/', hash: '#work' }, matchPath: '/work' },
+  { key: 'studio', label: 'studio', to: { pathname: '/', hash: '#studio' } },
+  { key: 'templates', label: 'templates', to: { pathname: '/', hash: '#templates' }, matchPath: '/templates' },
+  { key: 'blog', label: 'blog', to: { pathname: '/', hash: '#blog' }, matchPath: '/blog' },
 ];
 
 export function Nav() {
@@ -23,7 +25,7 @@ export function Nav() {
         </Link>
         <div className="flex flex-wrap items-center gap-[clamp(12px,2.5vw,28px)]">
           {NAV_LINKS.map((item) => {
-            const isActive = !item.hashOnly && pathname === item.to;
+            const isActive = item.matchPath !== undefined && pathname === item.matchPath;
             return (
               <Link
                 key={item.key}
