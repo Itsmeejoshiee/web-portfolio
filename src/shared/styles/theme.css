@@ -1,0 +1,29 @@
+@theme {
+  --color-paper: #FAF6EF;
+  --color-ink: #2C2418;
+  --color-accent: #D85A30;
+  --color-accent-hover: #B8431F;
+  --color-muted: #6B6152;
+  --color-faint: #B5A992;
+  --color-border: #E8E0D2;
+
+  --color-peach: #F5C4B3;
+  --color-peach-ink: #712B13;
+  --color-lavender: #CECBF6;
+  --color-lavender-ink: #3C3489;
+  --color-mint: #9FE1CB;
+  --color-mint-ink: #085041;
+  --color-pink: #F4C0D1;
+  --color-pink-ink: #7A2440;
+  --color-pink-accent: #ED93B1;
+  --color-gold: #F3DFB6;
+  --color-gold-ink: #6B4A08;
+  --color-periwinkle: #7F77DD;
+  --color-green: #5DCAA5;
+
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'General Sans', 'Inter', system-ui, sans-serif;
+  --font-kr: 'Bricolage Grotesque', 'Noto Sans KR', sans-serif;
+  --font-sc: 'Bricolage Grotesque', 'Noto Sans SC', sans-serif;
+}
