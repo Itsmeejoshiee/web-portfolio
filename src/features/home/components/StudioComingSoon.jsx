@@ -1,15 +1,20 @@
 import { useClampPx } from '../../../shared/three/clampPx';
 import { THREE_COLORS } from '../../../shared/three/colors';
 import { ORGANIC_BLOB_RADII } from '../../../shared/three/radii';
+import { useIsMobile } from '../../../shared/hooks/useIsMobile';
 import { RingSticker } from '../../../shared/three/RingSticker';
 import { StickerCanvas } from '../../../shared/three/StickerCanvas';
 import { StickerShape } from '../../../shared/three/StickerShape';
 
 const SHADOW_BLACK = { shadowColor: '#000000', shadowOpacity: 0.4 };
 
+// Below 640px the corner-bleed blob/ring sit closer together relative to a
+// narrow section, and the square sticker crowds the centered text — so
+// mobile shrinks the two corner shapes and drops the square entirely.
 function StudioShapes() {
-  const blobSize = useClampPx(200, 26, 380);
-  const ringSize = useClampPx(120, 14, 200);
+  const isMobile = useIsMobile();
+  const blobSize = useClampPx(isMobile ? 140 : 200, 26, isMobile ? 220 : 380);
+  const ringSize = useClampPx(isMobile ? 80 : 120, 14, isMobile ? 140 : 200);
   const squareSize = useClampPx(40, 5, 70);
 
   return (
@@ -34,17 +39,19 @@ function StudioShapes() {
         {...SHADOW_BLACK}
         edges={{ bottom: -80, left: '8%' }}
       />
-      <StickerShape
-        kind="square"
-        width={squareSize}
-        height={squareSize}
-        fill={THREE_COLORS.mintBg}
-        showBorder={false}
-        shadowOffset={[5, -5]}
-        {...SHADOW_BLACK}
-        edges={{ top: '20%', left: '14%' }}
-        anim={{ type: 'float', duration: 9, delay: 1 }}
-      />
+      {isMobile ? null : (
+        <StickerShape
+          kind="square"
+          width={squareSize}
+          height={squareSize}
+          fill={THREE_COLORS.mintBg}
+          showBorder={false}
+          shadowOffset={[5, -5]}
+          {...SHADOW_BLACK}
+          edges={{ top: '20%', left: '14%' }}
+          anim={{ type: 'float', duration: 9, delay: 1 }}
+        />
+      )}
     </>
   );
 }

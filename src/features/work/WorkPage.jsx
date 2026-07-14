@@ -11,7 +11,7 @@ export function WorkPage() {
         badge="synced from notion …"
         intro="[Intro line placeholder — every project, client and personal, newest first.]"
       />
-      <section className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 px-6 pt-12 pb-24">
+      <section className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-6 px-6 pt-12 pb-24">
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}

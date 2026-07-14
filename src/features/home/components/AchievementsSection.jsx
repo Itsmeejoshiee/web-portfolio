@@ -47,7 +47,7 @@ export function AchievementsSection() {
       <h2 className="mb-10 font-display text-[clamp(34px,4vw,44px)] font-semibold tracking-[-0.01em]">
         Achievements<span className="text-accent">.</span>
       </h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-6">
         {ACHIEVEMENTS.map((achievement) => (
           <div key={achievement.id} className="raised-card flex flex-col gap-3.5 p-[26px]">
             <div className="flex items-center justify-between gap-3">

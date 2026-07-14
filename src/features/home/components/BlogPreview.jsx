@@ -14,7 +14,7 @@ export function BlogPreview() {
         </h2>
         <Link
           to="/blog"
-          className="text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="text-sm font-medium whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           All posts →
         </Link>
