@@ -1,12 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Hex literals (not CSS vars) since accent/accentTint feed the three.js
-// sticker materials as well as the DOM caret — keep in sync with tokens.css.
+// Hex literals (not CSS vars) since these feed the three.js sticker
+// materials as well as the DOM caret — keep in sync with tokens.css.
+// Each language gets its own 4-color set (accent, tint, swatchC, swatchD)
+// so every sticker in the hero cluster re-colors together, and no two
+// languages share the same accent (Hello and Kamusta used to collide).
 const LANGS = [
-  { word: 'Hello', color: '#2C2418', caret: '#D85A30', tint: '#F5C4B3' },
-  { word: '안녕하세요', color: '#7F77DD', tint: '#CECBF6', font: 'var(--font-kr)' },
-  { word: '你好', color: '#5DCAA5', tint: '#9FE1CB', font: 'var(--font-sc)' },
-  { word: 'Kamusta', color: '#D85A30', tint: '#F5C4B3' },
+  { word: 'Hello,', accent: '#D85A30', tint: '#F5C4B3', swatchC: '#F3DFB6', swatchD: '#ED93B1' },
+  {
+    word: '안녕하세요,',
+    accent: '#7F77DD',
+    tint: '#CECBF6',
+    swatchC: '#9FE1CB',
+    swatchD: '#F4C0D1',
+    font: 'var(--font-kr)',
+  },
+  {
+    word: '你好,',
+    accent: '#5DCAA5',
+    tint: '#9FE1CB',
+    swatchC: '#CECBF6',
+    swatchD: '#F3DFB6',
+    font: 'var(--font-sc)',
+  },
+  { word: 'Kamusta,', accent: '#ED93B1', tint: '#F4C0D1', swatchC: '#F5C4B3', swatchD: '#7F77DD' },
 ];
 
 const START_DELAY_MS = 1200;
@@ -17,10 +34,6 @@ const HOLD_MS = 1600;
 const FINAL_HOLD_MS = 3200;
 
 const INITIAL_LANG = LANGS[LANGS.length - 1];
-
-function caretColorFor(lang) {
-  return lang.caret ?? lang.color;
-}
 
 export function useHeroTypewriter() {
   const [text, setText] = useState(INITIAL_LANG.word);
@@ -89,14 +102,14 @@ export function useHeroTypewriter() {
     };
   }, []);
 
-  const caretColor = caretColorFor(lang);
-
   return {
     text,
     font: lang.font ?? 'var(--font-display)',
-    caretColor,
+    caretColor: lang.accent,
     caretAnim: idle ? 'dopBlink 1s step-end infinite' : 'none',
-    accent: caretColor,
+    accent: lang.accent,
     accentTint: lang.tint,
+    swatchC: lang.swatchC,
+    swatchD: lang.swatchD,
   };
 }

@@ -2,13 +2,12 @@ import { BlobCluster } from '../../../shared/components/BlobCluster';
 import { useHeroTypewriter } from '../hooks/useHeroTypewriter';
 
 export function HeroSection() {
-  const { text, font, caretColor, caretAnim, accent, accentTint } = useHeroTypewriter();
+  const { text, font, caretColor, caretAnim, accent, accentTint, swatchC, swatchD } = useHeroTypewriter();
 
   return (
     <header id="hero" className="relative flex min-h-[calc(92vh-64px)] items-center overflow-hidden">
-      <BlobCluster placement="hero" accent={accent} accentTint={accentTint} />
+      <BlobCluster placement="hero" accent={accent} accentTint={accentTint} swatchC={swatchC} swatchD={swatchD} />
       <div className="relative mx-auto w-full max-w-[1160px] px-6 py-[72px]">
-        <p className="mb-5 font-mono text-xs tracking-[0.14em] text-muted uppercase">software engineer — philippines</p>
         <h1
           className="m-0 flex min-h-[clamp(80px,14vw,190px)] items-center text-[clamp(56px,12vw,160px)] leading-[1.05] font-semibold tracking-[-0.02em] text-ink"
           style={{ fontFamily: font }}
@@ -20,6 +19,13 @@ export function HeroSection() {
             style={{ background: caretColor, animation: caretAnim }}
           />
         </h1>
+        <p className="mt-4 text-[clamp(28px,5vw,64px)] leading-[1.1] font-semibold tracking-[-0.02em] text-ink">
+          it's me,{' '}
+          <span className="inline-block -rotate-3 text-accent transition-transform duration-150 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:rotate-3 hover:scale-[1.06]">
+            Josh
+          </span>
+          !
+        </p>
         <p className="my-6 max-w-[520px] text-base text-muted">
           [One short line of hero copy — who Josh helps and how his sites feel. ~90 characters.]
         </p>
