@@ -24,7 +24,7 @@ const STUDIO_PROJECTS = [
 export function StudioLive() {
   return (
     <section id="studio" className="bg-ink text-paper">
-      <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fit,minmax(320px,1fr))] items-start gap-14 px-6 py-[104px]">
+      <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] items-start gap-14 px-6 py-[104px]">
         <div>
           <p className="mb-5 font-mono text-xs tracking-[0.14em] text-faint uppercase">02 · the studio</p>
           <h2 className="mb-4 font-display text-[clamp(40px,5vw,56px)] font-semibold tracking-[-0.01em] text-paper">

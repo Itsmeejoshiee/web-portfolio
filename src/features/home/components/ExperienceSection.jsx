@@ -58,7 +58,7 @@ export function ExperienceSection() {
       <h2 className="mb-12 font-display text-[clamp(34px,4vw,44px)] font-semibold tracking-[-0.01em]">
         Experience<span className="text-accent">.</span>
       </h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(420px,1fr))] items-start gap-[72px]">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-start gap-[72px]">
         <div>
           <div className="mb-7 flex items-center gap-2.5">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--color-accent)' }} />

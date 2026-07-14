@@ -12,17 +12,19 @@ export function SelectedWorkPreview() {
         <h2 className="font-display text-[clamp(34px,4vw,44px)] font-semibold tracking-[-0.01em]">
           Selected work<span className="text-accent">.</span>
         </h2>
-        <div className="flex items-baseline gap-5">
-          <span className="font-mono text-[11px] tracking-[0.1em] text-faint">synced from notion …</span>
+        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+          <span className="font-mono text-[11px] whitespace-nowrap tracking-[0.1em] text-faint">
+            synced from notion …
+          </span>
           <Link
             to="/work"
-            className="text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="text-sm font-medium whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             see more →
           </Link>
         </div>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-6">
         {featuredProjects.map((project) => (
           <ProjectCard key={project.id} project={project} href="#work" />
         ))}
