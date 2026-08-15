@@ -10,6 +10,7 @@ const TemplatesPage = lazy(() =>
   import('../features/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
 const BlogPage = lazy(() => import('../features/blog/BlogPage').then((m) => ({ default: m.BlogPage })));
+const AdminApp = lazy(() => import('../features/admin/AdminApp').then((m) => ({ default: m.AdminApp })));
 
 export function App() {
   return (
@@ -49,6 +50,14 @@ export function App() {
             }
           />
         </Route>
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={null}>
+              <AdminApp />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
