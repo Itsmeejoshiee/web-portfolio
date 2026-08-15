@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request, Response } from 'express';
 import { SESSION_COOKIE_NAME, JwtAuthGuard } from './jwt-auth.guard';
 import type { AdminUser } from './github.strategy';
+import { getSessionCookieOptions } from './session-cookie-options';
 
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:5173';
 
@@ -23,12 +24,7 @@ export class AuthController {
     const user = req.user as AdminUser;
     const token = this.jwtService.sign({ githubId: user.githubId, username: user.username });
 
-    res.cookie(SESSION_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
 
     res.redirect(`${WEB_ORIGIN}/admin`);
   }
@@ -41,7 +37,7 @@ export class AuthController {
 
   @Get('logout')
   logout(@Res() res: Response) {
-    res.clearCookie(SESSION_COOKIE_NAME);
+    res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
     res.redirect(`${WEB_ORIGIN}/admin/login`);
   }
 }
