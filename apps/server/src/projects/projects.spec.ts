@@ -3,7 +3,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { DbModule } from '../db/db.module';
 import { ProjectsModule } from './projects.module';
-import { createTestDb, truncateAllTables } from '../test/test-db';
+import { createTestDb, truncateTables } from '../test/test-db';
 import { createTestApp } from '../test/test-app';
 
 describe('Projects API', () => {
@@ -22,7 +22,7 @@ describe('Projects API', () => {
   });
 
   beforeEach(async () => {
-    await truncateAllTables(pool);
+    await truncateTables(pool, 'projects');
   });
 
   it('GET /projects returns an empty list when there are no projects', async () => {
