@@ -6,6 +6,7 @@ import { BlogPostsModule } from './blog-posts/blog-posts.module';
 import { TemplatesModule } from './templates/templates.module';
 import { ExperienceModule } from './experience/experience.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { ToolboxGroupsModule } from './toolbox-groups/toolbox-groups.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     TemplatesModule,
     ExperienceModule,
     AchievementsModule,
+    ToolboxGroupsModule,
   ],
   controllers: [],
   providers: [],
