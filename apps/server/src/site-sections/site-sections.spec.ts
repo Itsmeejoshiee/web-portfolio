@@ -1,26 +1,33 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { eq } from 'drizzle-orm';
 import { DbModule } from '../db/db.module';
 import { SiteSectionsModule } from './site-sections.module';
-import { createTestDb, truncateTables } from '../test/test-db';
+import { createTestDb } from '../test/test-db';
 import { createTestApp } from '../test/test-app';
+import { siteSections } from '../db/schema';
+
+const SEEDED_SECTION_KEYS = [
+  'blog-header',
+  'contact',
+  'hero',
+  'studio-mission',
+  'templates-header',
+  'templates-preview',
+  'toolbox',
+  'work-header',
+];
 
 describe('Site Sections API', () => {
   let app: INestApplication;
+  let db: ReturnType<typeof createTestDb>['db'];
   let pool: ReturnType<typeof createTestDb>['pool'];
   let adminCookie: string;
 
-  const heroSection = {
-    section: 'hero',
-    body: 'Building fast, focused web experiences.',
-    ctaLabel: null,
-    ctaUrl: null,
-  };
-
   beforeAll(async () => {
     ({ app, adminCookie } = await createTestApp([DbModule, SiteSectionsModule]));
-    ({ pool } = createTestDb());
+    ({ db, pool } = createTestDb());
   });
 
   afterAll(async () => {
@@ -28,75 +35,26 @@ describe('Site Sections API', () => {
     await pool.end();
   });
 
+  // site_sections is enum-constrained to exactly the 8 rows seeded by migration — there
+  // is no create/delete, so isolation resets each row instead of truncating the table.
   beforeEach(async () => {
-    await truncateTables(pool, 'site_sections');
+    await db.update(siteSections).set({ body: null, ctaLabel: null, ctaUrl: null });
   });
 
-  it('GET /site-sections returns an empty list when there are no sections', async () => {
+  it('GET /site-sections returns the 8 seeded sections', async () => {
     const response = await request(app.getHttpServer()).get('/site-sections');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
-  });
-
-  it('POST /site-sections creates a section when authenticated', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
-
-    expect(response.status).toBe(201);
-    expect(response.body).toMatchObject({ section: 'hero', body: heroSection.body });
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(1);
-  });
-
-  it('POST /site-sections is rejected without authentication', async () => {
-    const response = await request(app.getHttpServer()).post('/site-sections').send(heroSection);
-
-    expect(response.status).toBe(401);
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(0);
-  });
-
-  it('POST /site-sections rejects an invalid payload with 400', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send({ body: 'Missing the section key' });
-
-    expect(response.status).toBe(400);
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(0);
-  });
-
-  it('POST /site-sections rejects a duplicate section key with 409', async () => {
-    await request(app.getHttpServer()).post('/site-sections').set('Cookie', adminCookie).send(heroSection);
-
-    const response = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send({ ...heroSection, body: 'A different body for the same section key' });
-
-    expect(response.status).toBe(409);
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(1);
+    expect(response.body.map((s: { section: string }) => s.section).sort()).toEqual(SEEDED_SECTION_KEYS);
   });
 
   it('GET /site-sections/:id returns the matching section', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
+    const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
 
-    const response = await request(app.getHttpServer()).get(`/site-sections/${created.body.id}`);
+    const response = await request(app.getHttpServer()).get(`/site-sections/${hero.id}`);
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ id: created.body.id, section: 'hero' });
+    expect(response.body).toMatchObject({ id: hero.id, section: 'hero' });
   });
 
   it('GET /site-sections/:id returns 404 for a section that does not exist', async () => {
@@ -105,40 +63,44 @@ describe('Site Sections API', () => {
     expect(response.status).toBe(404);
   });
 
-  it('PATCH /site-sections/:id updates a section when authenticated', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
+  it('PATCH /site-sections/:id updates body when authenticated', async () => {
+    const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
 
     const response = await request(app.getHttpServer())
-      .patch(`/site-sections/${created.body.id}`)
+      .patch(`/site-sections/${hero.id}`)
       .set('Cookie', adminCookie)
       .send({ body: 'An updated tagline.' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ id: created.body.id, body: 'An updated tagline.' });
+    expect(response.body).toMatchObject({ id: hero.id, body: 'An updated tagline.' });
   });
 
-  it('PATCH /site-sections/:id rejects renaming to a section key that already exists with 409', async () => {
-    await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send({ ...heroSection, section: 'contact' });
-    const created = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
+  it('PATCH /site-sections/:id updates ctaLabel and ctaUrl on the contact section', async () => {
+    const [contact] = await db.select().from(siteSections).where(eq(siteSections.section, 'contact'));
 
     const response = await request(app.getHttpServer())
-      .patch(`/site-sections/${created.body.id}`)
+      .patch(`/site-sections/${contact.id}`)
       .set('Cookie', adminCookie)
-      .send({ section: 'contact' });
+      .send({ ctaLabel: 'hello@joshgorospe.com', ctaUrl: 'mailto:hello@joshgorospe.com' });
 
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      id: contact.id,
+      ctaLabel: 'hello@joshgorospe.com',
+      ctaUrl: 'mailto:hello@joshgorospe.com',
+    });
+  });
 
-    const unchanged = await request(app.getHttpServer()).get(`/site-sections/${created.body.id}`);
-    expect(unchanged.body.section).toBe('hero');
+  it('PATCH /site-sections/:id ignores an attempt to change section', async () => {
+    const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
+
+    const response = await request(app.getHttpServer())
+      .patch(`/site-sections/${hero.id}`)
+      .set('Cookie', adminCookie)
+      .send({ section: 'contact', body: 'Still the hero section.' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: hero.id, section: 'hero', body: 'Still the hero section.' });
   });
 
   it('PATCH /site-sections/:id returns 404 for a section that does not exist', async () => {
@@ -151,54 +113,32 @@ describe('Site Sections API', () => {
   });
 
   it('PATCH /site-sections/:id is rejected without authentication', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
+    const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
 
     const response = await request(app.getHttpServer())
-      .patch(`/site-sections/${created.body.id}`)
+      .patch(`/site-sections/${hero.id}`)
       .send({ body: 'An updated tagline.' });
 
     expect(response.status).toBe(401);
 
-    const unchanged = await request(app.getHttpServer()).get(`/site-sections/${created.body.id}`);
-    expect(unchanged.body.body).toBe(heroSection.body);
+    const unchanged = await request(app.getHttpServer()).get(`/site-sections/${hero.id}`);
+    expect(unchanged.body.body).toBeNull();
   });
 
-  it('DELETE /site-sections/:id removes a section when authenticated', async () => {
-    const created = await request(app.getHttpServer())
+  it('has no POST route', async () => {
+    const response = await request(app.getHttpServer())
       .post('/site-sections')
       .set('Cookie', adminCookie)
-      .send(heroSection);
-
-    const response = await request(app.getHttpServer())
-      .delete(`/site-sections/${created.body.id}`)
-      .set('Cookie', adminCookie);
-
-    expect(response.status).toBe(200);
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(0);
-  });
-
-  it('DELETE /site-sections/:id returns 404 for a section that does not exist', async () => {
-    const response = await request(app.getHttpServer()).delete('/site-sections/999999').set('Cookie', adminCookie);
+      .send({ section: 'hero', body: 'A new hero' });
 
     expect(response.status).toBe(404);
   });
 
-  it('DELETE /site-sections/:id is rejected without authentication', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/site-sections')
-      .set('Cookie', adminCookie)
-      .send(heroSection);
+  it('has no DELETE route', async () => {
+    const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
 
-    const response = await request(app.getHttpServer()).delete(`/site-sections/${created.body.id}`);
+    const response = await request(app.getHttpServer()).delete(`/site-sections/${hero.id}`).set('Cookie', adminCookie);
 
-    expect(response.status).toBe(401);
-
-    const list = await request(app.getHttpServer()).get('/site-sections');
-    expect(list.body).toHaveLength(1);
+    expect(response.status).toBe(404);
   });
 });

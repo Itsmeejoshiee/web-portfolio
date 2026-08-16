@@ -7,6 +7,7 @@ export const blogPosts = pgTable('blog_posts', {
   date: date('date').notNull(),
   readTimeMinutes: integer('read_time_minutes').notNull(),
   tag: text('tag').notNull(),
+  content: text('content'),
   featured: boolean('featured').notNull().default(false),
   imageUrl: text('image_url'),
   ...timestampColumns,

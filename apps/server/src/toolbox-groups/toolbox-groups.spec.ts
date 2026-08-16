@@ -1,24 +1,22 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { eq } from 'drizzle-orm';
 import { DbModule } from '../db/db.module';
 import { ToolboxGroupsModule } from './toolbox-groups.module';
-import { createTestDb, truncateTables } from '../test/test-db';
+import { createTestDb } from '../test/test-db';
 import { createTestApp } from '../test/test-app';
+import { toolboxGroups } from '../db/schema';
 
 describe('Toolbox Groups API', () => {
   let app: INestApplication;
+  let db: ReturnType<typeof createTestDb>['db'];
   let pool: ReturnType<typeof createTestDb>['pool'];
   let adminCookie: string;
 
-  const validGroup = {
-    category: 'Languages',
-    items: ['python', 'typescript', 'javascript', 'sql'],
-  };
-
   beforeAll(async () => {
     ({ app, adminCookie } = await createTestApp([DbModule, ToolboxGroupsModule]));
-    ({ pool } = createTestDb());
+    ({ db, pool } = createTestDb());
   });
 
   afterAll(async () => {
@@ -26,71 +24,30 @@ describe('Toolbox Groups API', () => {
     await pool.end();
   });
 
+  // toolbox_groups is enum-constrained to exactly 3 rows seeded by migration — there is
+  // no create/delete, so isolation resets each row's items instead of truncating the table.
   beforeEach(async () => {
-    await truncateTables(pool, 'toolbox_groups');
+    await db.update(toolboxGroups).set({ items: [] });
   });
 
-  it('GET /toolbox-groups returns an empty list when there are no groups', async () => {
+  it('GET /toolbox-groups returns the 3 seeded categories', async () => {
     const response = await request(app.getHttpServer()).get('/toolbox-groups');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
-  });
-
-  it('POST /toolbox-groups creates a group when authenticated', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send(validGroup);
-
-    expect(response.status).toBe(201);
-    expect(response.body).toMatchObject({ category: 'Languages', items: ['python', 'typescript', 'javascript', 'sql'] });
-
-    const list = await request(app.getHttpServer()).get('/toolbox-groups');
-    expect(list.body).toHaveLength(1);
-  });
-
-  it('POST /toolbox-groups creates a group with an empty items array', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send({ category: 'Tools', items: [] });
-
-    expect(response.status).toBe(201);
-    expect(response.body).toMatchObject({ category: 'Tools', items: [] });
-  });
-
-  it('POST /toolbox-groups is rejected without authentication', async () => {
-    const response = await request(app.getHttpServer()).post('/toolbox-groups').send(validGroup);
-
-    expect(response.status).toBe(401);
-
-    const list = await request(app.getHttpServer()).get('/toolbox-groups');
-    expect(list.body).toHaveLength(0);
-  });
-
-  it('POST /toolbox-groups rejects an invalid payload with 400', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send({ category: 'Languages', items: 'not-an-array' });
-
-    expect(response.status).toBe(400);
-
-    const list = await request(app.getHttpServer()).get('/toolbox-groups');
-    expect(list.body).toHaveLength(0);
+    expect(response.body.map((g: { category: string }) => g.category).sort()).toEqual([
+      'frameworks',
+      'languages',
+      'tools',
+    ]);
   });
 
   it('GET /toolbox-groups/:id returns the matching group', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send(validGroup);
+    const [languages] = await db.select().from(toolboxGroups).where(eq(toolboxGroups.category, 'languages'));
 
-    const response = await request(app.getHttpServer()).get(`/toolbox-groups/${created.body.id}`);
+    const response = await request(app.getHttpServer()).get(`/toolbox-groups/${languages.id}`);
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ id: created.body.id, category: 'Languages' });
+    expect(response.body).toMatchObject({ id: languages.id, category: 'languages' });
   });
 
   it('GET /toolbox-groups/:id returns 404 for a group that does not exist', async () => {
@@ -99,19 +56,28 @@ describe('Toolbox Groups API', () => {
     expect(response.status).toBe(404);
   });
 
-  it('PATCH /toolbox-groups/:id updates a group when authenticated', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send(validGroup);
+  it('PATCH /toolbox-groups/:id updates items when authenticated', async () => {
+    const [languages] = await db.select().from(toolboxGroups).where(eq(toolboxGroups.category, 'languages'));
 
     const response = await request(app.getHttpServer())
-      .patch(`/toolbox-groups/${created.body.id}`)
+      .patch(`/toolbox-groups/${languages.id}`)
       .set('Cookie', adminCookie)
       .send({ items: ['python', 'go'] });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ id: created.body.id, items: ['python', 'go'] });
+    expect(response.body).toMatchObject({ id: languages.id, items: ['python', 'go'] });
+  });
+
+  it('PATCH /toolbox-groups/:id ignores an attempt to change category', async () => {
+    const [languages] = await db.select().from(toolboxGroups).where(eq(toolboxGroups.category, 'languages'));
+
+    const response = await request(app.getHttpServer())
+      .patch(`/toolbox-groups/${languages.id}`)
+      .set('Cookie', adminCookie)
+      .send({ category: 'tools', items: ['python'] });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: languages.id, category: 'languages', items: ['python'] });
   });
 
   it('PATCH /toolbox-groups/:id returns 404 for a group that does not exist', async () => {
@@ -124,54 +90,34 @@ describe('Toolbox Groups API', () => {
   });
 
   it('PATCH /toolbox-groups/:id is rejected without authentication', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send(validGroup);
+    const [languages] = await db.select().from(toolboxGroups).where(eq(toolboxGroups.category, 'languages'));
 
     const response = await request(app.getHttpServer())
-      .patch(`/toolbox-groups/${created.body.id}`)
+      .patch(`/toolbox-groups/${languages.id}`)
       .send({ items: ['python'] });
 
     expect(response.status).toBe(401);
 
-    const unchanged = await request(app.getHttpServer()).get(`/toolbox-groups/${created.body.id}`);
-    expect(unchanged.body.items).toEqual(['python', 'typescript', 'javascript', 'sql']);
+    const unchanged = await request(app.getHttpServer()).get(`/toolbox-groups/${languages.id}`);
+    expect(unchanged.body.items).toEqual([]);
   });
 
-  it('DELETE /toolbox-groups/:id removes a group when authenticated', async () => {
-    const created = await request(app.getHttpServer())
+  it('has no POST route', async () => {
+    const response = await request(app.getHttpServer())
       .post('/toolbox-groups')
       .set('Cookie', adminCookie)
-      .send(validGroup);
-
-    const response = await request(app.getHttpServer())
-      .delete(`/toolbox-groups/${created.body.id}`)
-      .set('Cookie', adminCookie);
-
-    expect(response.status).toBe(200);
-
-    const list = await request(app.getHttpServer()).get('/toolbox-groups');
-    expect(list.body).toHaveLength(0);
-  });
-
-  it('DELETE /toolbox-groups/:id returns 404 for a group that does not exist', async () => {
-    const response = await request(app.getHttpServer()).delete('/toolbox-groups/999999').set('Cookie', adminCookie);
+      .send({ category: 'languages', items: ['rust'] });
 
     expect(response.status).toBe(404);
   });
 
-  it('DELETE /toolbox-groups/:id is rejected without authentication', async () => {
-    const created = await request(app.getHttpServer())
-      .post('/toolbox-groups')
-      .set('Cookie', adminCookie)
-      .send(validGroup);
+  it('has no DELETE route', async () => {
+    const [languages] = await db.select().from(toolboxGroups).where(eq(toolboxGroups.category, 'languages'));
 
-    const response = await request(app.getHttpServer()).delete(`/toolbox-groups/${created.body.id}`);
+    const response = await request(app.getHttpServer())
+      .delete(`/toolbox-groups/${languages.id}`)
+      .set('Cookie', adminCookie);
 
-    expect(response.status).toBe(401);
-
-    const list = await request(app.getHttpServer()).get('/toolbox-groups');
-    expect(list.body).toHaveLength(1);
+    expect(response.status).toBe(404);
   });
 });

@@ -74,6 +74,16 @@ describe('Blog Posts API', () => {
     expect(list.body).toHaveLength(0);
   });
 
+  it('POST /blog-posts stores the post content', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/blog-posts')
+      .set('Cookie', adminCookie)
+      .send({ ...validPost, content: 'Paragraph one.\n\nParagraph two.' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.content).toBe('Paragraph one.\n\nParagraph two.');
+  });
+
   it('GET /blog-posts/:id returns the matching post', async () => {
     const created = await request(app.getHttpServer()).post('/blog-posts').set('Cookie', adminCookie).send(validPost);
 
@@ -99,6 +109,18 @@ describe('Blog Posts API', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ id: created.body.id, featured: false });
+  });
+
+  it('PATCH /blog-posts/:id updates the post content', async () => {
+    const created = await request(app.getHttpServer()).post('/blog-posts').set('Cookie', adminCookie).send(validPost);
+
+    const response = await request(app.getHttpServer())
+      .patch(`/blog-posts/${created.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ content: 'Updated body copy.' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.content).toBe('Updated body copy.');
   });
 
   it('PATCH /blog-posts/:id returns 404 for a post that does not exist', async () => {
