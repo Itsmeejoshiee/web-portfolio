@@ -20,6 +20,7 @@ export const RESOURCE_CONFIGS = [
       { name: 'date', label: 'Date', type: 'date', required: true },
       { name: 'readTimeMinutes', label: 'Read time (minutes)', type: 'number', required: true },
       { name: 'tag', label: 'Tag', type: 'text', required: true },
+      { name: 'content', label: 'Content', type: 'textarea' },
       { name: 'featured', label: 'Featured', type: 'checkbox' },
       { name: 'imageUrl', label: 'Image URL', type: 'text' },
     ],
@@ -69,26 +70,36 @@ export const RESOURCE_CONFIGS = [
     ],
   },
   {
-    key: 'toolbox-groups',
-    label: 'Toolbox Groups',
-    titleField: 'category',
-    fields: [
-      { name: 'category', label: 'Category (e.g. "Languages")', type: 'text', required: true },
-      { name: 'items', label: 'Items (comma-separated)', type: 'tags' },
-    ],
-  },
-  {
     key: 'site-sections',
     label: 'Site Sections',
     titleField: 'section',
+    allowCreate: false,
+    allowDelete: false,
+    formatTitle: (row) => SITE_SECTION_LABELS[row.section] ?? row.section,
     fields: [
-      { name: 'section', label: 'Section key (e.g. "hero")', type: 'text', required: true },
+      {
+        name: 'section',
+        label: 'Section',
+        type: 'readonly',
+        formatValue: (value) => SITE_SECTION_LABELS[value] ?? value,
+      },
       { name: 'body', label: 'Body', type: 'textarea' },
-      { name: 'ctaLabel', label: 'CTA label', type: 'text' },
-      { name: 'ctaUrl', label: 'CTA URL', type: 'text' },
+      { name: 'ctaLabel', label: 'CTA label (contact section only)', type: 'text' },
+      { name: 'ctaUrl', label: 'CTA URL (contact section only)', type: 'text' },
     ],
   },
 ];
+
+export const SITE_SECTION_LABELS = {
+  hero: 'Hero',
+  contact: 'Say hi / Contact',
+  toolbox: 'Toolbox intro',
+  'templates-preview': 'Templates preview (home)',
+  'work-header': 'Work page header',
+  'templates-header': 'Templates page header',
+  'blog-header': 'Blog page header',
+  'studio-mission': 'Studio mission (Haraya)',
+};
 
 export function getResourceConfig(key) {
   const config = RESOURCE_CONFIGS.find((r) => r.key === key);

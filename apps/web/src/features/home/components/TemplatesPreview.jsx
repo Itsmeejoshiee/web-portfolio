@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom';
+import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 import { TemplateCard } from '../../templates/components/TemplateCard';
 import { templates } from '../../templates/data/templates';
 
 const featuredTemplates = templates.filter((template) => template.featured);
+const FALLBACK_BODY = 'Intro line placeholder — systems from real freelance work.';
 
 export function TemplatesPreview() {
+  const section = useSiteSection('templates-preview');
+
   return (
     <section id="templates" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
       <p className="mb-4 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">03 · notion templates</p>
@@ -24,9 +28,7 @@ export function TemplatesPreview() {
           </Link>
         </div>
       </div>
-      <p className="mb-10 max-w-[520px] text-[15px] text-muted">
-        [Intro line placeholder — systems from real freelance work.]
-      </p>
+      <p className="mb-10 max-w-[520px] text-[15px] text-muted">{section?.body ?? FALLBACK_BODY}</p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-6">
         {featuredTemplates.map((template) => (
           <TemplateCard key={template.id} template={template} />

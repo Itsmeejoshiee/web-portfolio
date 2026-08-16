@@ -10,6 +10,7 @@ const TemplatesPage = lazy(() =>
   import('../features/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
 const BlogPage = lazy(() => import('../features/blog/BlogPage').then((m) => ({ default: m.BlogPage })));
+const BlogPostPage = lazy(() => import('../features/blog/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
 const AdminApp = lazy(() => import('../features/admin/AdminApp').then((m) => ({ default: m.AdminApp })));
 
 export function App() {
@@ -46,6 +47,14 @@ export function App() {
             element={
               <Suspense fallback={null}>
                 <BlogPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/blog/:id"
+            element={
+              <Suspense fallback={null}>
+                <BlogPostPage />
               </Suspense>
             }
           />

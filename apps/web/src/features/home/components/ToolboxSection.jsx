@@ -1,6 +1,11 @@
 import { Tag } from '../../../shared/components/Tag';
+import { useSiteSection } from '../../../shared/hooks/useSiteSection';
+import { useToolboxGroups } from '../../../shared/hooks/useToolboxGroups';
 
-const GROUPS = [
+const FALLBACK_BODY = 'One line placeholder — tools picked per project, not the other way around.';
+
+// Visual identity per category is fixed in code; only the item list is admin-editable.
+const GROUP_STYLES = [
   {
     id: 'languages',
     title: 'Languages',
@@ -8,7 +13,7 @@ const GROUPS = [
     dotRadius: '46% 54% 58% 42% / 50% 44% 56% 50%',
     hoverBorder: 'var(--color-accent)',
     hoverText: 'var(--color-accent)',
-    items: ['python', 'typescript', 'javascript', 'sql'],
+    fallbackItems: ['python', 'typescript', 'javascript', 'sql'],
   },
   {
     id: 'frameworks',
@@ -17,7 +22,7 @@ const GROUPS = [
     dotRadius: '54% 46% 44% 56% / 48% 56% 44% 52%',
     hoverBorder: 'var(--color-periwinkle)',
     hoverText: 'var(--color-periwinkle)',
-    items: ['react', 'next.js', 'node.js', 'tailwind', 'three.js', 'notion api'],
+    fallbackItems: ['react', 'next.js', 'node.js', 'tailwind', 'three.js', 'notion api'],
   },
   {
     id: 'tools',
@@ -26,11 +31,19 @@ const GROUPS = [
     dotRadius: '50%',
     hoverBorder: 'var(--color-green)',
     hoverText: 'var(--color-mint-ink)',
-    items: ['git / github', 'vercel', 'figma', 'notion'],
+    fallbackItems: ['git / github', 'vercel', 'figma', 'notion'],
   },
 ];
 
 export function ToolboxSection() {
+  const section = useSiteSection('toolbox');
+  const toolboxGroups = useToolboxGroups();
+
+  const groups = GROUP_STYLES.map((style) => ({
+    ...style,
+    items: toolboxGroups?.find((g) => g.category === style.id)?.items ?? style.fallbackItems,
+  }));
+
   return (
     <section id="toolbox" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
       <p className="mb-4 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">06 · toolbox</p>
@@ -40,11 +53,9 @@ export function ToolboxSection() {
         </h2>
         <span className="font-mono text-[11px] tracking-[0.1em] text-faint">the stack behind the work …</span>
       </div>
-      <p className="mb-11 max-w-[520px] text-[15px] text-muted">
-        [One line placeholder — tools picked per project, not the other way around.]
-      </p>
+      <p className="mb-11 max-w-[520px] text-[15px] text-muted">{section?.body ?? FALLBACK_BODY}</p>
       <div className="flex flex-col gap-10">
-        {GROUPS.map((group) => (
+        {groups.map((group) => (
           <div key={group.id} className="flex flex-col gap-[18px]">
             <div className="flex items-center gap-2.5">
               <span className="h-2.5 w-2.5" style={{ background: group.dotColor, borderRadius: group.dotRadius }} />

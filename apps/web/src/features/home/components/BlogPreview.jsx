@@ -1,10 +1,18 @@
 import { Link } from 'react-router-dom';
+import { AsyncGate } from '../../../shared/components/AsyncGate';
 import { BlogListItem } from '../../blog/components/BlogListItem';
-import { posts } from '../../blog/data/posts';
-
-const featuredPosts = posts.filter((post) => post.featured);
+import { useBlogPosts } from '../../blog/hooks/useBlogPosts';
+import { toDisplayPost } from '../../blog/utils/formatPost';
 
 export function BlogPreview() {
+  const { posts, loading, error } = useBlogPosts();
+  // Map before filter: toDisplayPost assigns tag colors by position in the full list, so a
+  // post keeps the same color here as on the full /blog page. Filtering first would rebase
+  // each post's index to its position among only the featured ones, changing its color.
+  const featuredPosts = (posts ?? [])
+    .map((post, index) => toDisplayPost(post, index))
+    .filter((post) => post.featured);
+
   return (
     <section id="blog" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
       <p className="mb-4 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">07 · from the blog</p>
@@ -20,9 +28,11 @@ export function BlogPreview() {
         </Link>
       </div>
       <div className="flex flex-col">
-        {featuredPosts.map((post) => (
-          <BlogListItem key={post.id} post={post} href="#blog" />
-        ))}
+        <AsyncGate loading={loading} error={error}>
+          {featuredPosts.map((post) => (
+            <BlogListItem key={post.id} post={post} />
+          ))}
+        </AsyncGate>
       </div>
     </section>
   );
