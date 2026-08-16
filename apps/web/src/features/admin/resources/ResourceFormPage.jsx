@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { adminApi } from '../api/adminApiClient';
 import { getResourceConfig } from './resourceConfigs';
 import { useResourceMutations } from './useResourceMutations';
@@ -23,6 +23,7 @@ function toFormValues(row, fields) {
 function toPayload(values, fields) {
   const payload = {};
   for (const field of fields) {
+    if (field.type === 'readonly') continue;
     const raw = values[field.name];
     if (field.type === 'tags') {
       payload[field.name] = raw
@@ -57,6 +58,10 @@ export function ResourceFormPage({ mode }) {
       setLoadingRow(false);
     });
   }, [mode, resource, id, config.fields]);
+
+  if (mode === 'create' && config.allowCreate === false) {
+    return <Navigate to={`/admin/${resource}`} replace />;
+  }
 
   function handleChange(name, value) {
     setValues((prev) => ({ ...prev, [name]: value }));

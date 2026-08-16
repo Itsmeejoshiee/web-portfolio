@@ -8,6 +8,10 @@ export function AdminDashboardPage() {
         Content<span className="text-accent">.</span>
       </h1>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6">
+        <Link to="/admin/toolbox" className="raised-card block p-6">
+          <h2 className="font-display text-lg font-semibold">Toolbox</h2>
+          <p className="mt-1 text-sm text-muted">Manage the skills listed per category</p>
+        </Link>
         {RESOURCE_CONFIGS.map((resource) => (
           <Link key={resource.key} to={`/admin/${resource.key}`} className="raised-card block p-6">
             <h2 className="font-display text-lg font-semibold">{resource.label}</h2>

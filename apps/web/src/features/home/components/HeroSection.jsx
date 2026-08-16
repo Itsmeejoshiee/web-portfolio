@@ -1,10 +1,14 @@
 import { BlobCluster, HeroButtonsAccent, HeroNameAccent } from '../../../shared/components/BlobCluster';
 import { useIsMobile } from '../../../shared/hooks/useIsMobile';
+import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 import { useHeroTypewriter } from '../hooks/useHeroTypewriter';
+
+const FALLBACK_BODY = 'One short line of hero copy — who Josh helps and how his sites feel.';
 
 export function HeroSection() {
   const { text, font, caretColor, caretAnim, accent, accentTint, swatchC, swatchD } = useHeroTypewriter();
   const isMobile = useIsMobile();
+  const section = useSiteSection('hero');
 
   return (
     <header id="hero" className="relative flex min-h-[calc(92vh-64px)] items-center overflow-hidden">
@@ -35,9 +39,7 @@ export function HeroSection() {
             <HeroNameAccent accent={accent} accentTint={accentTint} swatchC={swatchC} swatchD={swatchD} />
           ) : null}
         </div>
-        <p className="my-6 max-w-[520px] text-base text-muted">
-          [One short line of hero copy — who Josh helps and how his sites feel. ~90 characters.]
-        </p>
+        <p className="my-6 max-w-[520px] text-base text-muted">{section?.body ?? FALLBACK_BODY}</p>
         <div className="flex flex-wrap items-center gap-4">
           <a
             href="#work"

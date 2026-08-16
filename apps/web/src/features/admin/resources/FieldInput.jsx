@@ -8,7 +8,11 @@ export function FieldInput({ field, value, onChange }) {
         {field.label}
         {field.required ? ' *' : ''}
       </span>
-      {field.type === 'textarea' ? (
+      {field.type === 'readonly' ? (
+        <span className={`${baseInputClass} cursor-not-allowed bg-[var(--color-border)] text-faint`}>
+          {field.formatValue ? field.formatValue(value) : value}
+        </span>
+      ) : field.type === 'textarea' ? (
         <textarea
           className={baseInputClass}
           rows={4}

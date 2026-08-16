@@ -1,4 +1,7 @@
 import { Tag } from '../../../shared/components/Tag';
+import { useSiteSection } from '../../../shared/hooks/useSiteSection';
+
+const FALLBACK_MISSION = 'One-line studio mission placeholder — what Haraya makes and why.';
 
 const STUDIO_PROJECTS = [
   {
@@ -22,6 +25,8 @@ const STUDIO_PROJECTS = [
 ];
 
 export function StudioLive() {
+  const section = useSiteSection('studio-mission');
+
   return (
     <section id="studio" className="bg-ink text-paper">
       <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] items-start gap-14 px-6 py-[104px]">
@@ -33,9 +38,7 @@ export function StudioLive() {
           <p className="mb-3 text-[17px] text-paper">
             <em className="text-peach italic">haraya</em> — Filipino for <strong>imagination</strong>.
           </p>
-          <p className="mb-8 max-w-[420px] text-[15px] text-faint">
-            [One-line studio mission placeholder — what Haraya makes and why.]
-          </p>
+          <p className="mb-8 max-w-[420px] text-[15px] text-faint">{section?.body ?? FALLBACK_MISSION}</p>
           <a
             href="#studio"
             className="inline-block rounded-full border-[1.5px] border-[rgba(250,246,239,0.45)] px-6 py-[11px] text-sm font-medium text-paper shadow-[3px_3px_0_rgba(0,0,0,0.4)] transition-[transform,border-color] duration-150 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.04] hover:border-accent hover:text-paper active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
