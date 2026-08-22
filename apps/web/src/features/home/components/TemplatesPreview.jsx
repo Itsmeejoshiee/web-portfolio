@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 import { TemplateCard } from '../../templates/components/TemplateCard';
-import { templates } from '../../templates/data/templates';
+import { useTemplates } from '../../templates/hooks/useTemplates';
+import { toDisplayTemplate } from '../../templates/utils/formatTemplate';
 
-const featuredTemplates = templates.filter((template) => template.featured);
 const FALLBACK_BODY = 'Reusable systems and starter kits, pulled straight from real freelance work.';
+const PREVIEW_LIMIT = 3;
 
 export function TemplatesPreview() {
   const section = useSiteSection('templates-preview');
+  const { templates } = useTemplates();
+  const featuredTemplates = (templates ?? []).filter((template) => template.featured).slice(0, PREVIEW_LIMIT);
 
   return (
     <section id="templates" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
@@ -31,7 +34,7 @@ export function TemplatesPreview() {
       <p className="mb-10 max-w-[520px] text-[15px] text-muted">{section?.body ?? FALLBACK_BODY}</p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-6">
         {featuredTemplates.map((template) => (
-          <TemplateCard key={template.id} template={template} />
+          <TemplateCard key={template.id} template={toDisplayTemplate(template)} />
         ))}
       </div>
     </section>

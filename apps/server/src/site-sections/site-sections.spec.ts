@@ -9,6 +9,7 @@ import { createTestApp } from '../test/test-app';
 import { siteSections } from '../db/schema';
 
 const SEEDED_SECTION_KEYS = [
+  'achievements-header',
   'blog-header',
   'hero',
   'studio-mission',
@@ -34,13 +35,13 @@ describe('Site Sections API', () => {
     await pool.end();
   });
 
-  // site_sections is enum-constrained to exactly the 7 rows seeded by migration — there
+  // site_sections is enum-constrained to exactly the 8 rows seeded by migration — there
   // is no create/delete, so isolation resets each row instead of truncating the table.
   beforeEach(async () => {
     await db.update(siteSections).set({ body: null });
   });
 
-  it('GET /site-sections returns the 7 seeded sections', async () => {
+  it('GET /site-sections returns the 8 seeded sections', async () => {
     const response = await request(app.getHttpServer()).get('/site-sections');
 
     expect(response.status).toBe(200);

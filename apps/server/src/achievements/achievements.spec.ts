@@ -16,6 +16,7 @@ describe('Achievements API', () => {
     event: 'TechCrunch Hackathon · 2024',
     description: 'Built a real-time collab tool.',
     category: 'hackathon',
+    featured: true,
   };
 
   beforeAll(async () => {
@@ -165,5 +166,60 @@ describe('Achievements API', () => {
 
     const list = await request(app.getHttpServer()).get('/achievements');
     expect(list.body).toHaveLength(1);
+  });
+
+  it('POST /achievements rejects a 4th featured achievement with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      const response = await request(app.getHttpServer())
+        .post('/achievements')
+        .set('Cookie', adminCookie)
+        .send(validAchievement);
+      expect(response.status).toBe(201);
+    }
+
+    const response = await request(app.getHttpServer())
+      .post('/achievements')
+      .set('Cookie', adminCookie)
+      .send(validAchievement);
+
+    expect(response.status).toBe(400);
+
+    const list = await request(app.getHttpServer()).get('/achievements');
+    expect(list.body).toHaveLength(3);
+  });
+
+  it('PATCH /achievements/:id rejects featuring a 4th achievement with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      await request(app.getHttpServer()).post('/achievements').set('Cookie', adminCookie).send(validAchievement);
+    }
+    const notFeatured = await request(app.getHttpServer())
+      .post('/achievements')
+      .set('Cookie', adminCookie)
+      .send({ ...validAchievement, featured: false });
+
+    const response = await request(app.getHttpServer())
+      .patch(`/achievements/${notFeatured.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('PATCH /achievements/:id allows re-saving an already-featured achievement', async () => {
+    for (let i = 0; i < 2; i += 1) {
+      await request(app.getHttpServer()).post('/achievements').set('Cookie', adminCookie).send(validAchievement);
+    }
+    const third = await request(app.getHttpServer())
+      .post('/achievements')
+      .set('Cookie', adminCookie)
+      .send(validAchievement);
+
+    const response = await request(app.getHttpServer())
+      .patch(`/achievements/${third.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true, title: 'Renamed Hack' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ title: 'Renamed Hack', featured: true });
   });
 });

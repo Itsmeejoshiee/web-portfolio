@@ -5,6 +5,7 @@ import { DRIZZLE } from '../db/db.module';
 import { achievements } from '../db/schema';
 import * as schema from '../db/schema';
 import { assertFound } from '../common/assert-found';
+import { assertFeaturedLimitNotExceeded } from '../common/featured-limit';
 import type { CreateAchievementDto, UpdateAchievementDto } from './achievements.dto';
 
 @Injectable()
@@ -21,11 +22,17 @@ export class AchievementsService {
   }
 
   async create(dto: CreateAchievementDto) {
+    if (dto.featured) {
+      await assertFeaturedLimitNotExceeded(this.db, achievements, 'achievements');
+    }
     const [achievement] = await this.db.insert(achievements).values(dto).returning();
     return achievement;
   }
 
   async update(id: number, dto: UpdateAchievementDto) {
+    if (dto.featured) {
+      await assertFeaturedLimitNotExceeded(this.db, achievements, 'achievements', id);
+    }
     const [achievement] = await this.db
       .update(achievements)
       .set({ ...dto, updatedAt: new Date() })

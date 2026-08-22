@@ -8,6 +8,7 @@ export const siteSectionKeyEnum = pgEnum('site_section_key', [
   'work-header',
   'templates-header',
   'blog-header',
+  'achievements-header',
   'studio-mission',
 ]);
 

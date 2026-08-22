@@ -10,3 +10,51 @@
     box-shadow: 9px 9px 0 var(--color-ink);
   }
 }
+
+/* Restores the list/blockquote/heading styling Tailwind's preflight strips, for
+   rich-text blog content — shared by the public post page, the admin preview, and
+   the Tiptap editing surface, so all three render identically. */
+@utility prose {
+  & h2 {
+    margin-top: 0.5em;
+    font-family: var(--font-display);
+    font-size: 1.5em;
+    font-weight: 600;
+  }
+
+  & h3 {
+    margin-top: 0.5em;
+    font-family: var(--font-display);
+    font-size: 1.25em;
+    font-weight: 600;
+  }
+
+  & ul,
+  & ol {
+    margin: 0;
+    padding-left: 1.5em;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li + li {
+    margin-top: 0.25em;
+  }
+
+  & blockquote {
+    margin: 0;
+    padding-left: 1em;
+    border-left: 3px solid var(--color-border);
+    color: var(--color-muted);
+  }
+
+  & a {
+    text-decoration: underline;
+  }
+}

@@ -16,7 +16,6 @@ describe('Blog Posts API', () => {
     date: '2024-06-15',
     readTimeMinutes: 6,
     tag: 'process',
-    featured: true,
   };
 
   beforeAll(async () => {
@@ -47,7 +46,8 @@ describe('Blog Posts API', () => {
       .send(validPost);
 
     expect(response.status).toBe(201);
-    expect(response.body).toMatchObject({ title: validPost.title, tag: 'process', featured: true });
+    expect(response.body).toMatchObject({ title: validPost.title, tag: 'process' });
+    expect(response.body).not.toHaveProperty('featured');
 
     const list = await request(app.getHttpServer()).get('/blog-posts');
     expect(list.body).toHaveLength(1);
@@ -105,10 +105,10 @@ describe('Blog Posts API', () => {
     const response = await request(app.getHttpServer())
       .patch(`/blog-posts/${created.body.id}`)
       .set('Cookie', adminCookie)
-      .send({ featured: false });
+      .send({ tag: 'freelancing' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ id: created.body.id, featured: false });
+    expect(response.body).toMatchObject({ id: created.body.id, tag: 'freelancing' });
   });
 
   it('PATCH /blog-posts/:id updates the post content', async () => {
@@ -137,12 +137,12 @@ describe('Blog Posts API', () => {
 
     const response = await request(app.getHttpServer())
       .patch(`/blog-posts/${created.body.id}`)
-      .send({ featured: false });
+      .send({ tag: 'freelancing' });
 
     expect(response.status).toBe(401);
 
     const unchanged = await request(app.getHttpServer()).get(`/blog-posts/${created.body.id}`);
-    expect(unchanged.body.featured).toBe(true);
+    expect(unchanged.body.tag).toBe('process');
   });
 
   it('DELETE /blog-posts/:id removes a post when authenticated', async () => {

@@ -5,6 +5,7 @@ import { DRIZZLE } from '../db/db.module';
 import { templates } from '../db/schema';
 import * as schema from '../db/schema';
 import { assertFound } from '../common/assert-found';
+import { assertFeaturedLimitNotExceeded } from '../common/featured-limit';
 import type { CreateTemplateDto, UpdateTemplateDto } from './templates.dto';
 
 @Injectable()
@@ -21,11 +22,17 @@ export class TemplatesService {
   }
 
   async create(dto: CreateTemplateDto) {
+    if (dto.featured) {
+      await assertFeaturedLimitNotExceeded(this.db, templates, 'templates');
+    }
     const [template] = await this.db.insert(templates).values(dto).returning();
     return template;
   }
 
   async update(id: number, dto: UpdateTemplateDto) {
+    if (dto.featured) {
+      await assertFeaturedLimitNotExceeded(this.db, templates, 'templates', id);
+    }
     const [template] = await this.db
       .update(templates)
       .set({ ...dto, updatedAt: new Date() })

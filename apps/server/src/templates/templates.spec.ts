@@ -167,4 +167,59 @@ describe('Templates API', () => {
     const list = await request(app.getHttpServer()).get('/templates');
     expect(list.body).toHaveLength(1);
   });
+
+  it('POST /templates rejects a 4th featured template with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      const response = await request(app.getHttpServer())
+        .post('/templates')
+        .set('Cookie', adminCookie)
+        .send(validTemplate);
+      expect(response.status).toBe(201);
+    }
+
+    const response = await request(app.getHttpServer())
+      .post('/templates')
+      .set('Cookie', adminCookie)
+      .send(validTemplate);
+
+    expect(response.status).toBe(400);
+
+    const list = await request(app.getHttpServer()).get('/templates');
+    expect(list.body).toHaveLength(3);
+  });
+
+  it('PATCH /templates/:id rejects featuring a 4th template with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      await request(app.getHttpServer()).post('/templates').set('Cookie', adminCookie).send(validTemplate);
+    }
+    const notFeatured = await request(app.getHttpServer())
+      .post('/templates')
+      .set('Cookie', adminCookie)
+      .send({ ...validTemplate, featured: false });
+
+    const response = await request(app.getHttpServer())
+      .patch(`/templates/${notFeatured.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('PATCH /templates/:id allows re-saving an already-featured template', async () => {
+    for (let i = 0; i < 2; i += 1) {
+      await request(app.getHttpServer()).post('/templates').set('Cookie', adminCookie).send(validTemplate);
+    }
+    const third = await request(app.getHttpServer())
+      .post('/templates')
+      .set('Cookie', adminCookie)
+      .send(validTemplate);
+
+    const response = await request(app.getHttpServer())
+      .patch(`/templates/${third.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true, price: '₱ 999' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ price: '₱ 999', featured: true });
+  });
 });

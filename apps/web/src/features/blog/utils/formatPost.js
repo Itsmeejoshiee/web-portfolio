@@ -20,7 +20,6 @@ export function toDisplayPost(post, index) {
     title: post.title,
     readTime: `${post.readTimeMinutes} min read`,
     tag: { label: post.tag, ...color },
-    featured: post.featured,
     content: post.content,
   };
 }
