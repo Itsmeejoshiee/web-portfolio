@@ -161,4 +161,65 @@ describe('Projects API', () => {
     const list = await request(app.getHttpServer()).get('/projects');
     expect(list.body).toHaveLength(1);
   });
+
+  it('POST /projects rejects a 4th featured project with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      const response = await request(app.getHttpServer())
+        .post('/projects')
+        .set('Cookie', adminCookie)
+        .send({ title: `Project ${i}`, excerpt: 'An excerpt.', tags: [], featured: true });
+      expect(response.status).toBe(201);
+    }
+
+    const response = await request(app.getHttpServer())
+      .post('/projects')
+      .set('Cookie', adminCookie)
+      .send({ title: 'Project 4', excerpt: 'An excerpt.', tags: [], featured: true });
+
+    expect(response.status).toBe(400);
+
+    const list = await request(app.getHttpServer()).get('/projects');
+    expect(list.body).toHaveLength(3);
+  });
+
+  it('PATCH /projects/:id rejects featuring a 4th project with 400', async () => {
+    for (let i = 0; i < 3; i += 1) {
+      await request(app.getHttpServer())
+        .post('/projects')
+        .set('Cookie', adminCookie)
+        .send({ title: `Project ${i}`, excerpt: 'An excerpt.', tags: [], featured: true });
+    }
+    const notFeatured = await request(app.getHttpServer())
+      .post('/projects')
+      .set('Cookie', adminCookie)
+      .send({ title: 'Project 4', excerpt: 'An excerpt.', tags: [], featured: false });
+
+    const response = await request(app.getHttpServer())
+      .patch(`/projects/${notFeatured.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('PATCH /projects/:id allows re-saving an already-featured project', async () => {
+    for (let i = 0; i < 2; i += 1) {
+      await request(app.getHttpServer())
+        .post('/projects')
+        .set('Cookie', adminCookie)
+        .send({ title: `Project ${i}`, excerpt: 'An excerpt.', tags: [], featured: true });
+    }
+    const third = await request(app.getHttpServer())
+      .post('/projects')
+      .set('Cookie', adminCookie)
+      .send({ title: 'Project 2', excerpt: 'An excerpt.', tags: [], featured: true });
+
+    const response = await request(app.getHttpServer())
+      .patch(`/projects/${third.body.id}`)
+      .set('Cookie', adminCookie)
+      .send({ featured: true, excerpt: 'Updated excerpt.' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ excerpt: 'Updated excerpt.', featured: true });
+  });
 });

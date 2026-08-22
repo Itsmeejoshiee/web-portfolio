@@ -6,12 +6,15 @@ import { toDisplayPost } from '../../blog/utils/formatPost';
 
 export function BlogPreview() {
   const { posts, loading, error } = useBlogPosts();
-  // Map before filter: toDisplayPost assigns tag colors by position in the full list, so a
-  // post keeps the same color here as on the full /blog page. Filtering first would rebase
-  // each post's index to its position among only the featured ones, changing its color.
-  const featuredPosts = (posts ?? [])
-    .map((post, index) => toDisplayPost(post, index))
-    .filter((post) => post.featured);
+  // Pair each post with its position in the full list before sorting, since toDisplayPost
+  // assigns tag colors by that position — a post needs to keep the same color here as on the
+  // full /blog page, and sorting the raw list would lose its original index. Sort by the raw
+  // ISO date (lexically ordered) before toDisplayPost reformats it into a display string.
+  const latestPosts = (posts ?? [])
+    .map((post, index) => ({ post, index }))
+    .toSorted((a, b) => b.post.date.localeCompare(a.post.date))
+    .slice(0, 3)
+    .map(({ post, index }) => toDisplayPost(post, index));
 
   return (
     <section id="blog" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
@@ -29,7 +32,7 @@ export function BlogPreview() {
       </div>
       <div className="flex flex-col">
         <AsyncGate loading={loading} error={error}>
-          {featuredPosts.map((post) => (
+          {latestPosts.map((post) => (
             <BlogListItem key={post.id} post={post} />
           ))}
         </AsyncGate>

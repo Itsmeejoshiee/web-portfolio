@@ -7,23 +7,18 @@ export const RESOURCE_CONFIGS = [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'excerpt', label: 'Excerpt', type: 'textarea', required: true },
       { name: 'tags', label: 'Tags (comma-separated)', type: 'tags' },
-      { name: 'featured', label: 'Featured', type: 'checkbox' },
+      { name: 'featured', label: 'Featured (max 3 shown on the homepage)', type: 'checkbox' },
       { name: 'imageUrl', label: 'Image URL', type: 'text' },
     ],
   },
   {
+    // New/edit routes to the bespoke BlogPostEditorPage instead of the generic
+    // form — its rich-text content field needs the split-pane editor+preview
+    // layout the generic single-column ResourceFormPage can't provide.
     key: 'blog-posts',
     label: 'Blog Posts',
     titleField: 'title',
-    fields: [
-      { name: 'title', label: 'Title', type: 'text', required: true },
-      { name: 'date', label: 'Date', type: 'date', required: true },
-      { name: 'readTimeMinutes', label: 'Read time (minutes)', type: 'number', required: true },
-      { name: 'tag', label: 'Tag', type: 'text', required: true },
-      { name: 'content', label: 'Content', type: 'textarea' },
-      { name: 'featured', label: 'Featured', type: 'checkbox' },
-      { name: 'imageUrl', label: 'Image URL', type: 'text' },
-    ],
+    fields: [],
   },
   {
     key: 'templates',
@@ -34,7 +29,7 @@ export const RESOURCE_CONFIGS = [
       { name: 'description', label: 'Description', type: 'textarea', required: true },
       { name: 'price', label: 'Price ("free" or e.g. "₱ 499")', type: 'text', required: true },
       { name: 'url', label: 'URL', type: 'text', required: true },
-      { name: 'featured', label: 'Featured', type: 'checkbox' },
+      { name: 'featured', label: 'Featured (max 3 shown on the homepage)', type: 'checkbox' },
       { name: 'imageUrl', label: 'Image URL', type: 'text' },
     ],
   },
@@ -61,6 +56,7 @@ export const RESOURCE_CONFIGS = [
       { name: 'event', label: 'Event', type: 'text', required: true },
       { name: 'description', label: 'Description', type: 'textarea', required: true },
       { name: 'category', label: 'Category (e.g. "hackathon")', type: 'text', required: true },
+      { name: 'featured', label: 'Featured (max 3 shown on the homepage)', type: 'checkbox' },
     ],
   },
   {
@@ -102,6 +98,7 @@ export const SITE_SECTION_LABELS = {
   'work-header': 'Work page header',
   'templates-header': 'Templates page header',
   'blog-header': 'Blog page header',
+  'achievements-header': 'Achievements page header',
   'studio-mission': 'Studio mission (Haraya)',
 };
 

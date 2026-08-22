@@ -6,8 +6,10 @@ export function ProjectCard({ project, href = '#' }) {
       href={href}
       className="raised-card block overflow-hidden text-ink hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
-      <div className="relative h-[150px] overflow-hidden" style={{ background: project.bannerBg }}>
-        <div className="absolute box-border border-[3px] border-ink shadow-[6px_6px_0_var(--color-ink)]" style={project.shapeStyle} />
+      <div className="h-[150px]" style={{ background: project.bannerColor }}>
+        {project.imageUrl && (
+          <img src={project.imageUrl} alt="" className="h-full w-full object-cover" />
+        )}
       </div>
       <div className="px-6 pt-[22px] pb-[26px]">
         <h3 className="font-display mb-2 text-[21px] font-semibold">{project.title}</h3>

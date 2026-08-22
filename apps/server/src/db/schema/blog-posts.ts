@@ -1,4 +1,4 @@
-import { pgTable, text, integer, boolean, date } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, date } from 'drizzle-orm/pg-core';
 import { idColumn, timestampColumns } from './columns';
 
 export const blogPosts = pgTable('blog_posts', {
@@ -8,7 +8,6 @@ export const blogPosts = pgTable('blog_posts', {
   readTimeMinutes: integer('read_time_minutes').notNull(),
   tag: text('tag').notNull(),
   content: text('content'),
-  featured: boolean('featured').notNull().default(false),
   imageUrl: text('image_url'),
   ...timestampColumns,
 });

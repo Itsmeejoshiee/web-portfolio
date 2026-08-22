@@ -11,6 +11,9 @@ const TemplatesPage = lazy(() =>
 );
 const BlogPage = lazy(() => import('../features/blog/BlogPage').then((m) => ({ default: m.BlogPage })));
 const BlogPostPage = lazy(() => import('../features/blog/BlogPostPage').then((m) => ({ default: m.BlogPostPage })));
+const AchievementsPage = lazy(() =>
+  import('../features/home/AchievementsPage').then((m) => ({ default: m.AchievementsPage })),
+);
 const AdminApp = lazy(() => import('../features/admin/AdminApp').then((m) => ({ default: m.AdminApp })));
 
 export function App() {
@@ -55,6 +58,14 @@ export function App() {
             element={
               <Suspense fallback={null}>
                 <BlogPostPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/achievements"
+            element={
+              <Suspense fallback={null}>
+                <AchievementsPage />
               </Suspense>
             }
           />

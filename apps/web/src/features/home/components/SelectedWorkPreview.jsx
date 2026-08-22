@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ProjectCard } from '../../work/components/ProjectCard';
-import { projects } from '../../work/data/projects';
+import { useProjects } from '../../work/hooks/useProjects';
+import { toDisplayProject } from '../../work/utils/formatProject';
 
-const featuredProjects = projects.filter((project) => project.featured);
+const PREVIEW_LIMIT = 3;
 
 export function SelectedWorkPreview() {
+  const { projects } = useProjects();
+  const featuredProjects = (projects ?? []).filter((project) => project.featured).slice(0, PREVIEW_LIMIT);
+
   return (
     <section id="work" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
       <p className="mb-4 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">01 · selected work</p>
@@ -25,8 +29,8 @@ export function SelectedWorkPreview() {
         </div>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-6">
-        {featuredProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} href="#work" />
+        {featuredProjects.map((project, index) => (
+          <ProjectCard key={project.id} project={toDisplayProject(project, index)} href="#work" />
         ))}
       </div>
     </section>
