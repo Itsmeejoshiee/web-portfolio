@@ -3,7 +3,7 @@ import { useSiteSection } from '../../shared/hooks/useSiteSection';
 import { ProjectCard } from './components/ProjectCard';
 import { projects } from './data/projects';
 
-const FALLBACK_INTRO = 'Intro line placeholder — every project, client and personal, newest first.';
+const FALLBACK_INTRO = "Every project I've shipped — client work and personal builds, newest first.";
 
 export function WorkPage() {
   const section = useSiteSection('work-header');

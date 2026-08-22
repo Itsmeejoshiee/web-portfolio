@@ -15,6 +15,27 @@
       "when": 1786879909799,
       "tag": "0001_overconfident_sebastian_shaw",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787372277265,
+      "tag": "0002_add_contact_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787372381899,
+      "tag": "0003_split_contact_from_site_sections",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787372483499,
+      "tag": "0004_drop_experience_category",
+      "breakpoints": true
     }
   ]
 }

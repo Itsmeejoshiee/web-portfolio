@@ -1,57 +1,85 @@
-import { Tag } from '../../../shared/components/Tag';
+import { useExperience } from '../../../shared/hooks/useExperience';
 
-const PROFESSIONAL = [
+const FALLBACK_PROFESSIONAL = [
   {
     id: 'role-current',
-    role: '[Role placeholder] · [Organization]',
-    period: '[Mon] 20XX — present',
-    location: '[City, Philippines]',
-    summary: '[One-line summary placeholder.]',
+    title: 'Frontend Developer',
+    organization: 'Freelance',
+    startDate: 'Jan 2024',
+    endDate: null,
+    location: 'Manila, Philippines',
+    summary: 'Design and build web apps and portfolio sites for small studios and solo founders.',
   },
   {
     id: 'role-previous',
-    role: '[Previous role placeholder] · [Organization]',
-    period: '[Mon] 20XX — [Mon] 20XX',
-    location: '[City, Philippines]',
-    summary: '[One-line summary placeholder.]',
+    title: 'Junior Web Developer',
+    organization: 'Acme Studio',
+    startDate: 'Jun 2022',
+    endDate: 'Dec 2023',
+    location: 'Manila, Philippines',
+    summary: 'Built and maintained client marketing sites and internal tools.',
   },
   {
     id: 'role-earlier',
-    role: '[Earlier role placeholder] · [Organization]',
-    period: '[Mon] 20XX — [Mon] 20XX',
-    location: '[City, Philippines]',
-    summary: '[One-line summary placeholder.]',
+    title: 'Web Development Intern',
+    organization: 'Acme Studio',
+    startDate: 'Jan 2022',
+    endDate: 'May 2022',
+    location: 'Manila, Philippines',
+    summary: 'Assisted with front-end fixes and QA across client projects.',
   },
 ];
 
-const COMMUNITY = [
+const FALLBACK_COMMUNITY = [
   {
     id: 'community-one',
-    role: '[Community role placeholder] · [Organization]',
-    period: '[Mon] 20XX — present',
-    tag: { label: 'community', bg: 'var(--color-mint)', fg: 'var(--color-mint-ink)' },
-    dotColor: 'var(--color-green)',
-    summary: '[One-line summary placeholder.]',
+    title: 'Community Organizer',
+    organization: 'Dev Community PH',
+    startDate: 'Mar 2023',
+    endDate: null,
+    summary: 'Help run monthly meetups and workshops for early-career developers.',
   },
   {
     id: 'community-two',
-    role: '[Community role placeholder two] · [Organization]',
-    period: '[Mon] 20XX — [Mon] 20XX',
-    tag: { label: 'community', bg: 'var(--color-mint)', fg: 'var(--color-mint-ink)' },
-    dotColor: 'var(--color-green)',
-    summary: '[One-line summary placeholder.]',
-  },
-  {
-    id: 'mentorship-one',
-    role: '[Mentorship role placeholder] · [Organization]',
-    period: '[Mon] 20XX — [Mon] 20XX',
-    tag: { label: 'mentorship', bg: 'var(--color-lavender)', fg: 'var(--color-lavender-ink)' },
-    dotColor: 'var(--color-periwinkle)',
-    summary: '[One-line summary placeholder.]',
+    title: 'Volunteer Mentor',
+    organization: 'Code for Good',
+    startDate: 'Aug 2022',
+    endDate: 'Feb 2023',
+    summary: 'Paired bootcamp graduates with portfolio projects and job prep.',
   },
 ];
 
+function formatPeriod(entry) {
+  return `${entry.startDate} — ${entry.endDate ?? 'present'}`;
+}
+
+function ExperienceEntry({ item, dotColor }) {
+  return (
+    <div className="relative pl-[34px]">
+      <span
+        className="absolute top-1 left-[-9px] h-4 w-4 rounded-full border-[3px] border-paper outline-2 outline-ink"
+        style={{ background: dotColor }}
+      />
+      <h4 className="font-display text-[19px] font-semibold">
+        {item.title} · {item.organization}
+      </h4>
+      <div className="mt-1 flex flex-wrap items-baseline gap-3">
+        <span className="font-mono text-[11px] tracking-[0.06em] text-faint">{formatPeriod(item)}</span>
+        {item.location && <span className="font-mono text-[11px] tracking-[0.06em] text-faint">{item.location}</span>}
+      </div>
+      <p className="mt-1.5 max-w-[480px] text-sm text-muted">{item.summary}</p>
+    </div>
+  );
+}
+
 export function ExperienceSection() {
+  const entries = useExperience();
+
+  const liveProfessional = entries?.filter((entry) => entry.track === 'professional');
+  const liveCommunity = entries?.filter((entry) => entry.track === 'community');
+  const professional = liveProfessional?.length ? liveProfessional : FALLBACK_PROFESSIONAL;
+  const community = liveCommunity?.length ? liveCommunity : FALLBACK_COMMUNITY;
+
   return (
     <section id="experience" className="mx-auto max-w-[1160px] border-t border-border px-6 py-24">
       <p className="mb-4 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">04 · experience</p>
@@ -65,19 +93,8 @@ export function ExperienceSection() {
             <h3 className="font-display text-[22px] font-semibold">Professional</h3>
           </div>
           <div className="ml-[7px] flex flex-col gap-10 border-l-2 border-border py-1">
-            {PROFESSIONAL.map((item) => (
-              <div key={item.id} className="relative pl-[34px]">
-                <span
-                  className="absolute top-1 left-[-9px] h-4 w-4 rounded-full border-[3px] border-paper outline-2 outline-ink"
-                  style={{ background: 'var(--color-accent)' }}
-                />
-                <h4 className="font-display text-[19px] font-semibold">{item.role}</h4>
-                <div className="mt-1 flex flex-wrap items-baseline gap-3">
-                  <span className="font-mono text-[11px] tracking-[0.06em] text-faint">{item.period}</span>
-                  <span className="font-mono text-[11px] tracking-[0.06em] text-faint">{item.location}</span>
-                </div>
-                <p className="mt-1.5 max-w-[480px] text-sm text-muted">{item.summary}</p>
-              </div>
+            {professional.map((item) => (
+              <ExperienceEntry key={item.id} item={item} dotColor="var(--color-accent)" />
             ))}
           </div>
         </div>
@@ -87,21 +104,8 @@ export function ExperienceSection() {
             <h3 className="font-display text-[22px] font-semibold">Community &amp; mentorship</h3>
           </div>
           <div className="ml-[7px] flex flex-col gap-10 border-l-2 border-border py-1">
-            {COMMUNITY.map((item) => (
-              <div key={item.id} className="relative pl-[34px]">
-                <span
-                  className="absolute top-1 left-[-9px] h-4 w-4 rounded-full border-[3px] border-paper outline-2 outline-ink"
-                  style={{ background: item.dotColor }}
-                />
-                <h4 className="font-display text-[19px] font-semibold">{item.role}</h4>
-                <div className="mt-1 flex flex-wrap items-baseline gap-3">
-                  <span className="font-mono text-[11px] tracking-[0.06em] text-faint">{item.period}</span>
-                  <Tag size="tiny" bg={item.tag.bg} fg={item.tag.fg}>
-                    {item.tag.label}
-                  </Tag>
-                </div>
-                <p className="mt-1.5 max-w-[480px] text-sm text-muted">{item.summary}</p>
-              </div>
+            {community.map((item) => (
+              <ExperienceEntry key={item.id} item={item} dotColor="var(--color-green)" />
             ))}
           </div>
         </div>

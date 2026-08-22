@@ -5,3 +5,4 @@ export * from './experience';
 export * from './achievements';
 export * from './toolbox-groups';
 export * from './site-sections';
+export * from './contact';

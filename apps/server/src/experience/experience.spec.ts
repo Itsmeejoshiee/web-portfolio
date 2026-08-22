@@ -18,7 +18,6 @@ describe('Experience API', () => {
     startDate: 'Jan 2023',
     endDate: null,
     location: 'Manila, Philippines',
-    category: null,
     summary: 'Led the platform team.',
   };
 
@@ -29,7 +28,6 @@ describe('Experience API', () => {
     startDate: 'Mar 2022',
     endDate: 'Dec 2023',
     location: null,
-    category: 'mentorship',
     summary: 'Mentored early-career developers.',
   };
 
@@ -74,7 +72,8 @@ describe('Experience API', () => {
       .send(communityEntry);
 
     expect(response.status).toBe(201);
-    expect(response.body).toMatchObject({ track: 'community', category: 'mentorship' });
+    expect(response.body).toMatchObject({ track: 'community', title: 'Mentor' });
+    expect(response.body).not.toHaveProperty('category');
   });
 
   it('POST /experience is rejected without authentication', async () => {

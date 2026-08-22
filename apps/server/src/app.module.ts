@@ -8,6 +8,7 @@ import { ExperienceModule } from './experience/experience.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { ToolboxGroupsModule } from './toolbox-groups/toolbox-groups.module';
 import { SiteSectionsModule } from './site-sections/site-sections.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SiteSectionsModule } from './site-sections/site-sections.module';
     AchievementsModule,
     ToolboxGroupsModule,
     SiteSectionsModule,
+    ContactModule,
   ],
   controllers: [],
   providers: [],

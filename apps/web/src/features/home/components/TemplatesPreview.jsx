@@ -4,7 +4,7 @@ import { TemplateCard } from '../../templates/components/TemplateCard';
 import { templates } from '../../templates/data/templates';
 
 const featuredTemplates = templates.filter((template) => template.featured);
-const FALLBACK_BODY = 'Intro line placeholder — systems from real freelance work.';
+const FALLBACK_BODY = 'Reusable systems and starter kits, pulled straight from real freelance work.';
 
 export function TemplatesPreview() {
   const section = useSiteSection('templates-preview');
