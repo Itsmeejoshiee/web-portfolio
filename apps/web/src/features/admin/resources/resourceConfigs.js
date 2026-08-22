@@ -49,12 +49,6 @@ export const RESOURCE_CONFIGS = [
       { name: 'startDate', label: 'Start date (e.g. "Jan 2023")', type: 'text', required: true },
       { name: 'endDate', label: 'End date (blank = present)', type: 'text' },
       { name: 'location', label: 'Location (professional only)', type: 'text' },
-      {
-        name: 'category',
-        label: 'Category (community only)',
-        type: 'select',
-        options: ['community', 'mentorship'],
-      },
       { name: 'summary', label: 'Summary', type: 'textarea', required: true },
     ],
   },
@@ -84,15 +78,25 @@ export const RESOURCE_CONFIGS = [
         formatValue: (value) => SITE_SECTION_LABELS[value] ?? value,
       },
       { name: 'body', label: 'Body', type: 'textarea' },
-      { name: 'ctaLabel', label: 'CTA label (contact section only)', type: 'text' },
-      { name: 'ctaUrl', label: 'CTA URL (contact section only)', type: 'text' },
+    ],
+  },
+  {
+    key: 'contact',
+    label: 'Contact',
+    titleField: 'body',
+    allowCreate: false,
+    allowDelete: false,
+    formatTitle: () => 'Say hi / Contact',
+    fields: [
+      { name: 'body', label: 'Body', type: 'textarea' },
+      { name: 'ctaLabel', label: 'CTA label', type: 'text' },
+      { name: 'ctaUrl', label: 'CTA URL', type: 'text' },
     ],
   },
 ];
 
 export const SITE_SECTION_LABELS = {
   hero: 'Hero',
-  contact: 'Say hi / Contact',
   toolbox: 'Toolbox intro',
   'templates-preview': 'Templates preview (home)',
   'work-header': 'Work page header',

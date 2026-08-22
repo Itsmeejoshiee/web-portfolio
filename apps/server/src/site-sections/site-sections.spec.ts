@@ -10,7 +10,6 @@ import { siteSections } from '../db/schema';
 
 const SEEDED_SECTION_KEYS = [
   'blog-header',
-  'contact',
   'hero',
   'studio-mission',
   'templates-header',
@@ -35,13 +34,13 @@ describe('Site Sections API', () => {
     await pool.end();
   });
 
-  // site_sections is enum-constrained to exactly the 8 rows seeded by migration — there
+  // site_sections is enum-constrained to exactly the 7 rows seeded by migration — there
   // is no create/delete, so isolation resets each row instead of truncating the table.
   beforeEach(async () => {
-    await db.update(siteSections).set({ body: null, ctaLabel: null, ctaUrl: null });
+    await db.update(siteSections).set({ body: null });
   });
 
-  it('GET /site-sections returns the 8 seeded sections', async () => {
+  it('GET /site-sections returns the 7 seeded sections', async () => {
     const response = await request(app.getHttpServer()).get('/site-sections');
 
     expect(response.status).toBe(200);
@@ -75,29 +74,13 @@ describe('Site Sections API', () => {
     expect(response.body).toMatchObject({ id: hero.id, body: 'An updated tagline.' });
   });
 
-  it('PATCH /site-sections/:id updates ctaLabel and ctaUrl on the contact section', async () => {
-    const [contact] = await db.select().from(siteSections).where(eq(siteSections.section, 'contact'));
-
-    const response = await request(app.getHttpServer())
-      .patch(`/site-sections/${contact.id}`)
-      .set('Cookie', adminCookie)
-      .send({ ctaLabel: 'hello@joshgorospe.com', ctaUrl: 'mailto:hello@joshgorospe.com' });
-
-    expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({
-      id: contact.id,
-      ctaLabel: 'hello@joshgorospe.com',
-      ctaUrl: 'mailto:hello@joshgorospe.com',
-    });
-  });
-
   it('PATCH /site-sections/:id ignores an attempt to change section', async () => {
     const [hero] = await db.select().from(siteSections).where(eq(siteSections.section, 'hero'));
 
     const response = await request(app.getHttpServer())
       .patch(`/site-sections/${hero.id}`)
       .set('Cookie', adminCookie)
-      .send({ section: 'contact', body: 'Still the hero section.' });
+      .send({ section: 'toolbox', body: 'Still the hero section.' });
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ id: hero.id, section: 'hero', body: 'Still the hero section.' });

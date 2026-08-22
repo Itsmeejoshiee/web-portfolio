@@ -3,7 +3,7 @@ import { useIsMobile } from '../../../shared/hooks/useIsMobile';
 import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 import { useHeroTypewriter } from '../hooks/useHeroTypewriter';
 
-const FALLBACK_BODY = 'One short line of hero copy — who Josh helps and how his sites feel. ~90 characters.';
+const FALLBACK_BODY = 'I build sites that feel as good as they work — from portfolios to full-stack products.';
 
 export function HeroSection() {
   const { text, font, caretColor, caretAnim, accent, accentTint, swatchC, swatchD } = useHeroTypewriter();

@@ -3,7 +3,7 @@ import { useSiteSection } from '../../shared/hooks/useSiteSection';
 import { TemplateCard } from './components/TemplateCard';
 import { templates } from './data/templates';
 
-const FALLBACK_INTRO = 'Intro line placeholder — systems built from real freelance work, free and paid.';
+const FALLBACK_INTRO = 'Templates and starter kits built from real freelance work, free and paid.';
 
 export function TemplatesPage() {
   const section = useSiteSection('templates-header');

@@ -1,13 +1,13 @@
 import { BlobCluster } from '../../../shared/components/BlobCluster';
-import { useSiteSection } from '../../../shared/hooks/useSiteSection';
+import { useContactInfo } from '../../../shared/hooks/useContactInfo';
 
 const SOCIAL_LINKS = ['github', 'linkedin', 'twitter / x'];
-const FALLBACK_BODY = 'One warm closing line placeholder — invite the project conversation.';
-const FALLBACK_CTA_LABEL = 'hello@[domain]';
-const FALLBACK_CTA_URL = 'mailto:hello@example.com';
+const FALLBACK_BODY = "Got a project in mind? I'd love to hear about it.";
+const FALLBACK_CTA_LABEL = 'joshgorospe03@gmail.com';
+const FALLBACK_CTA_URL = 'mailto:joshgorospe03@gmail.com';
 
 export function ContactSection() {
-  const section = useSiteSection('contact');
+  const section = useContactInfo();
 
   return (
     <section

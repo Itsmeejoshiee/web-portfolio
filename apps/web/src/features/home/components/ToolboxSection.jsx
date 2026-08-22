@@ -2,7 +2,7 @@ import { Tag } from '../../../shared/components/Tag';
 import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 import { useToolboxGroups } from '../../../shared/hooks/useToolboxGroups';
 
-const FALLBACK_BODY = 'One line placeholder — tools picked per project, not the other way around.';
+const FALLBACK_BODY = 'The tools I actually reach for — picked to fit the project, not the other way around.';
 
 // Visual identity per category is fixed in code; only the item list is admin-editable.
 const GROUP_STYLES = [

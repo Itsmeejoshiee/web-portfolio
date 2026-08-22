@@ -5,7 +5,7 @@ import { BlogListItem } from './components/BlogListItem';
 import { useBlogPosts } from './hooks/useBlogPosts';
 import { toDisplayPost } from './utils/formatPost';
 
-const FALLBACK_INTRO = 'Intro line placeholder — notes on building for the web, freelancing, and community.';
+const FALLBACK_INTRO = 'Notes on building for the web, freelancing, and community.';
 
 export function BlogPage() {
   const section = useSiteSection('blog-header');

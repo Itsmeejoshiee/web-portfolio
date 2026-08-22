@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from '../db/db.module';
 import { toolboxGroups } from '../db/schema';
 import * as schema from '../db/schema';
-import { assertFound } from '../common/assert-found';
+import { findAllRows, findOneRow, updateRow } from '../common/fixed-row-crud';
 import type { UpdateToolboxGroupDto } from './toolbox-groups.dto';
 
 @Injectable()
@@ -12,20 +11,14 @@ export class ToolboxGroupsService {
   constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
 
   findAll() {
-    return this.db.select().from(toolboxGroups).orderBy(toolboxGroups.id);
+    return findAllRows(this.db, toolboxGroups);
   }
 
-  async findOne(id: number) {
-    const [group] = await this.db.select().from(toolboxGroups).where(eq(toolboxGroups.id, id));
-    return assertFound(group, 'Toolbox group', id);
+  findOne(id: number) {
+    return findOneRow(this.db, toolboxGroups, id, 'Toolbox group');
   }
 
-  async update(id: number, dto: UpdateToolboxGroupDto) {
-    const [group] = await this.db
-      .update(toolboxGroups)
-      .set({ ...dto, updatedAt: new Date() })
-      .where(eq(toolboxGroups.id, id))
-      .returning();
-    return assertFound(group, 'Toolbox group', id);
+  update(id: number, dto: UpdateToolboxGroupDto) {
+    return updateRow(this.db, toolboxGroups, id, dto, 'Toolbox group');
   }
 }
