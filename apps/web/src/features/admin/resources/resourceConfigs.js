@@ -99,7 +99,7 @@ export const SITE_SECTION_LABELS = {
   'templates-header': 'Templates page header',
   'blog-header': 'Blog page header',
   'achievements-header': 'Achievements page header',
-  'studio-mission': 'Studio mission (Haraya)',
+  'studio-mission': 'Studio mission (Manawari)',
 };
 
 export function getResourceConfig(key) {
