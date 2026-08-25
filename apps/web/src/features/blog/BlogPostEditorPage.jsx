@@ -19,6 +19,12 @@ const METADATA_FIELDS = [
 
 const EMPTY_FIELDS = { title: '', date: '', readTimeMinutes: '', tag: '', imageUrl: '' };
 
+function tabClassName(isActive) {
+  return `rounded-full border-2 border-ink px-4 py-2 text-sm font-medium transition-transform duration-150 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.02] ${
+    isActive ? 'bg-accent text-paper' : 'bg-paper text-ink'
+  }`;
+}
+
 export function BlogPostEditorPage({ mode }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,12 +32,15 @@ export function BlogPostEditorPage({ mode }) {
   const { create, update, submitting, error } = useResourceMutations('blog-posts');
   const [fields, setFields] = useState(EMPTY_FIELDS);
   const [contentHtml, setContentHtml] = useState('');
+  const [activeTab, setActiveTab] = useState('edit');
+  const [, forceToolbarUpdate] = useState(0);
 
   const editor = useEditor({
     extensions: [StarterKit, Link],
     content: '',
     immediatelyRender: false,
     onUpdate: ({ editor: editorInstance }) => setContentHtml(editorInstance.getHTML()),
+    onTransaction: () => forceToolbarUpdate((tick) => tick + 1),
   });
 
   useEffect(() => {
@@ -75,34 +84,72 @@ export function BlogPostEditorPage({ mode }) {
         {mode === 'create' ? 'New blog post' : 'Edit blog post'}
         <span className="text-accent">.</span>
       </h1>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <form onSubmit={handleSubmit} className="raised-card flex flex-col gap-5 p-8">
-          {METADATA_FIELDS.map((field) => (
-            <FieldInput key={field.name} field={field} value={fields[field.name]} onChange={handleFieldChange} />
-          ))}
-          <div className="flex flex-col gap-1.5">
-            <span className="font-mono text-[11px] tracking-[0.06em] text-faint uppercase">Content</span>
-            <EditorToolbar editor={editor} />
-            <EditorContent
-              editor={editor}
-              className="prose min-h-[240px] rounded-lg border-2 border-ink bg-paper px-3.5 py-2.5 text-sm [&_.ProseMirror]:outline-none"
-            />
-          </div>
-          {error && <p className="text-sm text-accent">{error.message}</p>}
-          <div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="rounded-full border-2 border-ink bg-accent px-6 py-3 text-sm font-semibold text-paper shadow-[3px_3px_0_var(--color-ink)] transition-transform duration-150 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.04] active:scale-[0.96] disabled:opacity-50"
-            >
-              {submitting ? 'Saving…' : 'Save'}
-            </button>
-          </div>
-        </form>
-        <div className="raised-card overflow-auto">
-          <PostBody post={previewPost} />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div role="tablist" aria-label="Blog post editor view" className="flex gap-2">
+          <button
+            type="button"
+            role="tab"
+            id="editor-tab-edit"
+            aria-selected={activeTab === 'edit'}
+            aria-controls="editor-panel-edit"
+            onClick={() => setActiveTab('edit')}
+            className={tabClassName(activeTab === 'edit')}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="editor-tab-preview"
+            aria-selected={activeTab === 'preview'}
+            aria-controls="editor-panel-preview"
+            onClick={() => setActiveTab('preview')}
+            className={tabClassName(activeTab === 'preview')}
+          >
+            Preview
+          </button>
         </div>
-      </div>
+
+        {activeTab === 'edit' && (
+          <div
+            id="editor-panel-edit"
+            role="tabpanel"
+            aria-labelledby="editor-tab-edit"
+            className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]"
+          >
+            <div className="raised-card flex flex-col gap-5 p-6">
+              {METADATA_FIELDS.map((field) => (
+                <FieldInput key={field.name} field={field} value={fields[field.name]} onChange={handleFieldChange} />
+              ))}
+            </div>
+            <div className="raised-card flex flex-col gap-1.5 p-6">
+              <span className="font-mono text-[11px] tracking-[0.06em] text-faint uppercase">Content</span>
+              <EditorToolbar editor={editor} />
+              <EditorContent
+                editor={editor}
+                className="prose min-h-[480px] rounded-lg border-2 border-ink bg-paper px-3.5 py-2.5 text-sm [&_.ProseMirror]:outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'preview' && (
+          <div id="editor-panel-preview" role="tabpanel" aria-labelledby="editor-tab-preview" className="raised-card overflow-auto p-6">
+            <PostBody post={previewPost} />
+          </div>
+        )}
+
+        {error && <p className="text-sm text-accent">{error.message}</p>}
+        <div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-full border-2 border-ink bg-accent px-6 py-3 text-sm font-semibold text-paper shadow-[3px_3px_0_var(--color-ink)] transition-transform duration-150 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.04] active:scale-[0.96] disabled:opacity-50"
+          >
+            {submitting ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
