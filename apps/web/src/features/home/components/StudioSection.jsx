@@ -1,7 +1,7 @@
 import { StudioComingSoon } from './StudioComingSoon';
 import { StudioLive } from './StudioLive';
 
-// Studio hasn't launched yet — flip to true once Haraya Labs goes live.
+// Studio hasn't launched yet — flip to true once Manawari Labs goes live.
 const STUDIO_LIVE = false;
 
 export function StudioSection() {

@@ -65,10 +65,10 @@ export function StudioComingSoon() {
       <div className="relative mx-auto max-w-[1160px] px-6 py-32 text-center">
         <p className="mb-6 font-mono text-xs tracking-[0.14em] text-faint uppercase">02 · the studio</p>
         <h2 className="mb-4 font-display text-[clamp(44px,6vw,72px)] font-semibold tracking-[-0.01em] text-paper">
-          haraya labs<span className="text-accent">.</span>
+          manawari labs<span className="text-accent">.</span>
         </h2>
         <p className="mb-8 text-[17px] text-paper">
-          <em className="text-peach italic">haraya</em> — Filipino for <strong>imagination</strong>.
+          <em className="text-peach italic">manawari</em> — Filipino for <strong>make it happen</strong>.
         </p>
         <p className="font-display text-[clamp(19px,2.2vw,24px)] font-medium text-peach">
           something is taking shape here<span className="text-accent">.</span>

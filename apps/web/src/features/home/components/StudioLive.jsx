@@ -1,7 +1,7 @@
 import { Tag } from '../../../shared/components/Tag';
 import { useSiteSection } from '../../../shared/hooks/useSiteSection';
 
-const FALLBACK_MISSION = 'One-line studio mission placeholder — what Haraya makes and why.';
+const FALLBACK_MISSION = 'One-line studio mission placeholder — what Manawari makes and why.';
 
 const STUDIO_PROJECTS = [
   {
@@ -33,10 +33,10 @@ export function StudioLive() {
         <div>
           <p className="mb-5 font-mono text-xs tracking-[0.14em] text-faint uppercase">02 · the studio</p>
           <h2 className="mb-4 font-display text-[clamp(40px,5vw,56px)] font-semibold tracking-[-0.01em] text-paper">
-            haraya labs<span className="text-accent">.</span>
+            manawari labs<span className="text-accent">.</span>
           </h2>
           <p className="mb-3 text-[17px] text-paper">
-            <em className="text-peach italic">haraya</em> — Filipino for <strong>imagination</strong>.
+            <em className="text-peach italic">manawari</em> — Filipino for <strong>make it happen</strong>.
           </p>
           <p className="mb-8 max-w-[420px] text-[15px] text-faint">{section?.body ?? FALLBACK_MISSION}</p>
           <a
